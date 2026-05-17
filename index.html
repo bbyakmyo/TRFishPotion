@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>낚시 포션 계산기</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #e2eaf3;
+            --surface: #ffffff;
+            --border: #d1dce8;
+            --text: #0f1b2e;
+            --text-secondary: #5a6d85;
+            --primary: #2563eb;
+            --primary-light: #dbeafe;
+            --accent-orange: #ea580c;
+            --accent-orange-bg: #fff2e8;
+            --accent-green: #059669;
+            --accent-green-bg: #e6f9f1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 400px;
+            padding: 16px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 16px 40px rgba(15, 27, 46, 0.08);
+            padding: 26px 22px 22px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 18px;
+            letter-spacing: -0.8px;
+            color: var(--text);
+        }
+
+        .input-wrap {
+            margin-bottom: 14px;
+        }
+        .input-wrap label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-align: left;
+        }
+        .input-wrap input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: var(--text);
+            font-family: inherit;
+            text-align: center;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            -moz-appearance: textfield;
+            background: #f8fafc;
+        }
+        .input-wrap input::-webkit-outer-spin-button,
+        .input-wrap input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        .input-wrap input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            background: #fff;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 14px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 4px;
+            font-size: 0.92rem;
+        }
+        .info-label {
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.82rem;
+        }
+        .info-value {
+            font-weight: 800;
+            font-family: 'Inter', monospace;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .result-box {
+            margin-top: 14px;
+            padding: 18px 12px 14px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+            color: #fff;
+        }
+        .result-count {
+            font-size: 2.6rem;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+        .result-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 6px;
+            opacity: 0.9;
+        }
+        .result-detail {
+            font-size: 0.78rem;
+            margin-top: 4px;
+            opacity: 0.75;
+            font-weight: 600;
+        }
+
+        .sub-box {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: none;
+        }
+        .sub-box.show { display: block; }
+
+        .remain-box {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid var(--border);
+        }
+        .done-box {
+            background: var(--accent-green-bg);
+            color: #065f46;
+        }
+
+        /* ── 모바일 가로 최적화 ── */
+        @media (max-height: 480px) and (orientation: landscape) {
+            body { align-items: flex-start; overflow-y: auto; }
+            .wrap { padding: 8px; }
+            .card { padding: 14px 16px; border-radius: 14px; }
+            h1 { font-size: 1.15rem; margin-bottom: 10px; }
+            .input-wrap { margin-bottom: 8px; }
+            .input-wrap input { padding: 8px 10px; font-size: 1.1rem; border-radius: 10px; }
+            .divider { margin: 8px 0; }
+            .info-row { padding: 4px 2px; font-size: 0.8rem; }
+            .result-box { margin-top: 8px; padding: 10px 8px 8px; border-radius: 10px; }
+            .result-count { font-size: 1.8rem; }
+            .result-label { font-size: 0.75rem; margin-top: 2px; }
+            .result-detail { font-size: 0.7rem; margin-top: 2px; }
+            .sub-box { margin-top: 6px; padding: 6px 8px; font-size: 0.75rem; }
+        }
+
+        /* ── PC ── */
+        @media (min-width: 1024px) {
+            .wrap { max-width: 360px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+    <div class="card">
+        <h1>🎣 낚시 포션 계산기</h1>
+
+        <div class="input-wrap">
+            <label for="currentValue">현재 수치</label>
+            <input type="number" id="currentValue" value="0" min="0" max="10000" oninput="calculate()">
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="info-row">
+            <span class="info-label">목표 수치</span>
+            <span class="info-value" id="targetDisplay">10,000</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">포션당 수치</span>
+            <span class="info-value">+60</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">필요한 수치</span>
+            <span class="info-value" id="neededDisplay">9,390</span>
+        </div>
+
+        <div class="result-box">
+            <div class="result-count" id="resultMain">157개</div>
+            <div class="result-label" id="resultSub">필요한 포션 개수</div>
+            <div class="result-detail" id="resultDetail">9,420 수치 획득</div>
+        </div>
+
+        <div class="sub-box remain-box" id="remainBox">
+            부족 30
+        </div>
+
+        <div class="sub-box done-box" id="doneBox">
+            이미 목표에 도달했습니다!
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// 설정
+// ============================================================
+const TARGET = 10000;
+const POTION_VALUE = 60;
+
+function calculate() {
+    let current = parseInt(document.getElementById('currentValue').value) || 0;
+
+    // 10000 초과 방지
+    if (current > TARGET) {
+        current = TARGET;
+        document.getElementById('currentValue').value = TARGET;
+    }
+
+    const needed = Math.max(0, TARGET - current);
+
+    document.getElementById('targetDisplay').textContent = TARGET.toLocaleString();
+    document.getElementById('neededDisplay').textContent = needed.toLocaleString();
+
+    const remainBox = document.getElementById('remainBox');
+    const doneBox   = document.getElementById('doneBox');
+    const resultMain   = document.getElementById('resultMain');
+    const resultSub    = document.getElementById('resultSub');
+    const resultDetail = document.getElementById('resultDetail');
+
+    if (current >= TARGET) {
+        resultMain.textContent = '0개';
+        resultSub.textContent = '추가 포션 불필요';
+        resultDetail.textContent = '';
+        remainBox.classList.remove('show');
+        doneBox.classList.add('show');
+        return;
+    }
+
+    doneBox.classList.remove('show');
+
+    // 초과 없이 10000 이하로 최대한 채우기
+    const count = Math.floor(needed / POTION_VALUE);
+    const totalGain = count * POTION_VALUE;
+    const final = current + totalGain;
+    const remain = TARGET - final;
+
+    resultMain.textContent = count.toLocaleString() + '개';
+    resultSub.textContent = '사용 가능한 포션';
+
+    if (remain === 0) {
+        resultDetail.textContent = `${totalGain.toLocaleString()} 수치 · 딱 맞춤`;
+        remainBox.classList.remove('show');
+    } else {
+        resultDetail.textContent = `${totalGain.toLocaleString()} 수치 획득`;
+        remainBox.textContent = `최종 ${final.toLocaleString()} / ${TARGET.toLocaleString()} · 부족 ${remain.toLocaleString()}`;
+        remainBox.classList.add('show');
+    }
+}
+
+calculate();
+</script>
+
+</body>
+</html>
